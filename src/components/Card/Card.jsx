@@ -1,35 +1,37 @@
 /*eslint no-unused-vars: "warn"*/
+//import { useState, useEffect } from 'react'
+
 import { format } from 'date-fns'
 import { Tag, Rate, ConfigProvider, Typography } from 'antd'
 
 import './Card.css'
 
-export default function CardFilm({ filmData = {}, text }) {
-  const {
-    title = 'The way back',
-    voteAverage,
-    releaseDate = 'March 5, 2020',
-    posterPath,
-    overview = null,
-    genre = [],
-  } = filmData
+export default function Card({ filmData = {} }) {
+  const { title, voteAverage, releaseDate, posterPath, overview = null, genre = [] } = filmData
 
   return (
     <a href="http://localhost:3000/#" className="card">
       <div className="poster">
-        <img src={`http://image.tmdb.org/t/p/w200${posterPath}`} alt="poster" />
+        <img
+          src={
+            posterPath
+              ? `http://image.tmdb.org/t/p/w200${posterPath}`
+              : 'https://www.kino-teatr.ru/static/images/no_poster.jpg'
+          }
+          alt="poster"
+        />
       </div>
       <div className="card-header">
         <div className="title-warapper">
           <h4 title={title}>{title}</h4>
           <div className="rate">{voteAverage ? voteAverage.toFixed(1) : '0.0'}</div>
         </div>
-        <div className="date">{format(releaseDate, 'MMMM d, yyyy')}</div>
+        <div className="date">{releaseDate ? format(releaseDate, 'MMMM d, yyyy') : 'No release date'}</div>
         {genre.map((item) => (
-          <Tag className="genre">{item}</Tag>
+          <Tag className="genre" key={item.id}>
+            {item.name}
+          </Tag>
         ))}
-        {/*<Tag className="genre">Action</Tag>
-        <Tag className="genre">Drama</Tag>*/}
       </div>
       <Typography.Paragraph
         ellipsis={{
@@ -41,7 +43,7 @@ export default function CardFilm({ filmData = {}, text }) {
           margin: '7px 0px 0px 0px',
         }}
       >
-        {overview || text}
+        {overview}
       </Typography.Paragraph>
       <ConfigProvider
         theme={{

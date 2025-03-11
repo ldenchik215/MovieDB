@@ -17,10 +17,11 @@ async function getResource(url) {
   return await res.json()
 }
 
-export function getMovieDBGenre() {
-  return getResource('/genre/movie/list')
+export async function getMovieDBGenre() {
+  const genresList = await getResource('/genre/movie/list')
+  return genresList.genres
 }
 
-export function getMovieDBSearch(query) {
-  return getResource(`/search/movie?query=${query}`)
+export function getMovieDBSearch(query, page) {
+  return getResource(`/search/movie?query=${query}&page=${page}`)
 }
