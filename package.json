@@ -23,6 +23,7 @@
   "dependencies": {
     "cra-template": "1.2.0",
     "react": "^19.0.0",
+    "react-detect-offline": "^2.4.5",
     "react-dom": "^19.0.0",
     "react-scripts": "^5.0.0"
   },

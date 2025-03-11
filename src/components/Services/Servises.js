@@ -22,6 +22,7 @@ export async function getMovieDBGenre() {
   return genresList.genres
 }
 
-export function getMovieDBSearch(query, page) {
-  return getResource(`/search/movie?query=${query}&page=${page}`)
+export async function getMovieDBSearch(query, page) {
+  const data = await getResource(`/search/movie?query=${query}&page=${page}`)
+  return data.results
 }
