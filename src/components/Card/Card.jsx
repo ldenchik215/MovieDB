@@ -35,8 +35,8 @@ export default function Card({ filmData = {} }) {
           </div>
           <div className="date">{releaseDate ? format(releaseDate, 'MMMM d, yyyy') : 'No release date'}</div>
           {genres.map((item) => (
-            <Tag className="genres" key={item.id}>
-              {item.name}
+            <Tag className="genres" key={item?.id}>
+              {item?.name}
             </Tag>
           ))}
         </div>

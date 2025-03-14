@@ -2,9 +2,4 @@
   display: flex;
   flex-wrap: wrap;
   gap: 36px;
-  max-width: 1010px;
-  height: 100%;
-  padding: 15px 36px;
-  margin: 0 auto;
-  background: #fff;
 }

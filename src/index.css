@@ -64,4 +64,17 @@ body {
   font-style: normal;
   font-size: 12px;
   line-height: 22px;
+  background: #F7F7F7;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1010px;
+  padding: 20px 36px;
+  margin: 0 auto;
+  background: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  /*justify-content: space-between;*/
 }
