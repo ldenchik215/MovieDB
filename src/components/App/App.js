@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { Spin, Alert } from 'antd'
 
 import { getMovieDBGenre, getMovieDBSearch, getMovieDBPopular } from '../Services/Servises'
+import GenresContext from '../../context/GenresContext'
 import Search from '../Search/Search'
 import CardList from '../CardList/CardList'
 import PagePagination from '../Pagination/PagePagination'
@@ -22,7 +23,7 @@ export default function App() {
     setLoading(false)
   }
 
-  const fillCard = (filmData, genres) => {
+  const fillCard = (filmData) => {
     return {
       id: filmData.id,
       posterPath: filmData.poster_path,
@@ -30,7 +31,7 @@ export default function App() {
       overview: filmData.overview,
       voteAverage: filmData.vote_average,
       releaseDate: filmData.release_date,
-      genres,
+      genreIds: filmData.genre_ids,
     }
   }
 
@@ -41,13 +42,7 @@ export default function App() {
     try {
       const moviesList = inputValue.trim() ? await getMovieDBSearch(inputValue, page) : await getMovieDBPopular(page)
 
-      const displayFilms = moviesList.results.map((movie) => {
-        const genres = movie.genre_ids.map((id) => {
-          const genre = genresList.filter((item) => item.id === id)
-          return genre[0]
-        })
-        return fillCard(movie, genres)
-      })
+      const displayFilms = moviesList.results.map((movie) => fillCard(movie))
 
       setTotalResults(moviesList.total_results)
       setFilms(displayFilms)
@@ -70,7 +65,9 @@ export default function App() {
     <>
       <main className="content">
         <Search onSearch={onSearch} pageCurrent={pageCurrent} setPageCurrent={setPageCurrent} />
-        <ContentView loading={loading} error={error} totalResults={totalResults} films={films} />
+        <GenresContext.Provider value={genresList}>
+          <ContentView loading={loading} error={error} totalResults={totalResults} films={films} />
+        </GenresContext.Provider>
       </main>
       <PagePagination setPageCurrent={setPageCurrent} pageCurrent={pageCurrent} totalResults={totalResults} />
     </>

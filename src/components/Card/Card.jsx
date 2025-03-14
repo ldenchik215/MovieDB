@@ -1,12 +1,21 @@
 /*eslint no-unused-vars: "warn"*/
-
+import React, { useContext } from 'react'
 import { format } from 'date-fns'
 import { Tag, Rate, ConfigProvider } from 'antd'
 
+import GenresContext from '../../context/GenresContext'
 import './Card.css'
 
-export default function Card({ filmData = {} }) {
-  const { title, voteAverage, releaseDate, posterPath, overview = null, genres = [] } = filmData
+export default function Card({ filmData }) {
+  const { title, voteAverage, releaseDate, posterPath, overview = null, genreIds = [] } = filmData
+  const genresList = useContext(GenresContext)
+
+  const genres = genreIds.map((id) => {
+    const genre = genresList.filter((item) => item.id === id)
+    return genre[0]
+  })
+
+  console.log(genres, genreIds)
 
   const truncateText = (text, maxLength = 199) => {
     let trancText = text.slice(0, maxLength)
@@ -35,8 +44,8 @@ export default function Card({ filmData = {} }) {
           </div>
           <div className="date">{releaseDate ? format(releaseDate, 'MMMM d, yyyy') : 'No release date'}</div>
           {genres.map((item) => (
-            <Tag className="genres" key={item?.id}>
-              {item?.name}
+            <Tag className="genres" key={item.id}>
+              {item.name}
             </Tag>
           ))}
         </div>
