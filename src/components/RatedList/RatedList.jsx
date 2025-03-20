@@ -19,6 +19,7 @@ export default function RatedList({ fillCards, genresList, sessionId }) {
   }
 
   useEffect(() => {
+    setLoading(true)
     async function fetchData() {
       try {
         const ratedMovies = await getRatedMovies(sessionId, pageCurrent)
@@ -32,7 +33,7 @@ export default function RatedList({ fillCards, genresList, sessionId }) {
     }
 
     fetchData()
-  }, [])
+  }, [pageCurrent])
 
   return (
     <div className="content">
