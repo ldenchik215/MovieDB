@@ -1,21 +1,36 @@
 /*eslint no-unused-vars: "warn"*/
 import React, { useContext } from 'react'
 import { format } from 'date-fns'
-import { Tag, Rate, ConfigProvider } from 'antd'
+import { Tag } from 'antd'
 
 import GenresContext from '../../context/GenresContext'
 import './Card.css'
+import StarRate from '../StarRate/StarRate'
 
-export default function Card({ filmData }) {
-  const { title, voteAverage, releaseDate, posterPath, overview = null, genreIds = [] } = filmData
+export default function Card({ filmData, sessionId }) {
+  const { title, voteAverage, releaseDate, posterPath, overview = null, genreIds = [], rating, id } = filmData
   const genresList = useContext(GenresContext)
 
-  const genres = genreIds.map((id) => {
-    const genre = genresList.filter((item) => item.id === id)
+  const rateStyle = {
+    borderColor: '#E90000',
+  }
+
+  if (voteAverage > 3) {
+    rateStyle.borderColor = '#E97E00'
+  }
+
+  if (voteAverage > 5) {
+    rateStyle.borderColor = '#E9D100'
+  }
+
+  if (voteAverage > 7) {
+    rateStyle.borderColor = '#66E900'
+  }
+
+  const genres = genreIds.map((genreId) => {
+    const genre = genresList.filter((item) => item.id === genreId)
     return genre[0]
   })
-
-  console.log(genres, genreIds)
 
   const truncateText = (text, maxLength = 199) => {
     let trancText = text.slice(0, maxLength)
@@ -25,7 +40,7 @@ export default function Card({ filmData }) {
   }
 
   return (
-    <a href="http://localhost:3000/#" className="card">
+    <div href="http://localhost:3000/#" className="card">
       <div className="poster">
         <img
           src={
@@ -40,7 +55,9 @@ export default function Card({ filmData }) {
         <div className="card-header">
           <div className="title-warapper">
             <h4 title={title}>{title}</h4>
-            <div className="rate">{voteAverage ? voteAverage.toFixed(1) : '0.0'}</div>
+            <div className="rate" style={rateStyle}>
+              {voteAverage ? voteAverage.toFixed(1) : '0.0'}
+            </div>
           </div>
           <div className="date">{releaseDate ? format(releaseDate, 'MMMM d, yyyy') : 'No release date'}</div>
           {genres.map((item) => (
@@ -50,19 +67,8 @@ export default function Card({ filmData }) {
           ))}
         </div>
         <p className="overview">{truncateText(overview)}</p>
-        <ConfigProvider
-          theme={{
-            components: {
-              Rate: {
-                starSize: 15,
-                marginXS: 7,
-              },
-            },
-          }}
-        >
-          <Rate count={10} defaultValue={2.5} disabled allowHalf starSize={15} />
-        </ConfigProvider>
+        <StarRate rating={rating} sessionId={sessionId} movieId={id} />
       </div>
-    </a>
+    </div>
   )
 }

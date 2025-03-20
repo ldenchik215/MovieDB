@@ -74,7 +74,4 @@ body {
   margin: 0 auto;
   background: #fff;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  /*justify-content: space-between;*/
 }

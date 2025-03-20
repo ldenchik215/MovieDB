@@ -1,48 +1,63 @@
 /*eslint no-unused-vars: "warn"*/
 import React, { useState, useEffect } from 'react'
-import { Spin, Alert } from 'antd'
+import { Tabs } from 'antd'
 
-import { getMovieDBGenre, getMovieDBSearch, getMovieDBPopular } from '../Services/Servises'
+import {
+  getMovieDBGenre,
+  getMovieDBSearch,
+  getMovieDBPopular,
+  getGuestSessionId,
+  getRatedMovies,
+} from '../Services/Servises'
 import GenresContext from '../../context/GenresContext'
 import Search from '../Search/Search'
-import CardList from '../CardList/CardList'
 import PagePagination from '../Pagination/PagePagination'
-import ErrorIndicator from '../Error-indicator/Error-indicator'
+import ContentView from '../ContentView/ContentView'
+import RatedList from '../RatedList/RatedList'
 import './App.css'
 
 export default function App() {
+  const [sessionId, setSesionId] = useState(null)
   const [films, setFilms] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [pageCurrent, setPageCurrent] = useState(1)
   const [totalResults, setTotalResults] = useState(0)
   const [genresList, setGenresList] = useState([])
+  const [ratedFilms, setRatedFilms] = useState([])
 
   function onError(err) {
     setError(true)
     setLoading(false)
   }
 
-  const fillCard = (filmData) => {
-    return {
-      id: filmData.id,
-      posterPath: filmData.poster_path,
-      title: filmData.title,
-      overview: filmData.overview,
-      voteAverage: filmData.vote_average,
-      releaseDate: filmData.release_date,
-      genreIds: filmData.genre_ids,
-    }
+  function onTest() {
+    console.log(sessionId)
+  }
+
+  const fillCards = (filmsArray = []) => {
+    return filmsArray.map((movie) => ({
+      id: movie.id,
+      posterPath: movie.poster_path,
+      title: movie.title,
+      overview: movie.overview,
+      voteAverage: movie.vote_average,
+      releaseDate: movie.release_date,
+      genreIds: movie.genre_ids,
+      rating: movie.rating,
+    }))
   }
 
   const onSearch = async (inputValue = '', page = 1) => {
     setLoading(true)
     setError(false)
+    console.log(`search ${sessionId}`)
+    onTest()
 
     try {
       const moviesList = inputValue.trim() ? await getMovieDBSearch(inputValue, page) : await getMovieDBPopular(page)
 
-      const displayFilms = moviesList.results.map((movie) => fillCard(movie))
+      const displayFilms = await fillCards(moviesList.results)
 
       setTotalResults(moviesList.total_results)
       setFilms(displayFilms)
@@ -54,48 +69,54 @@ export default function App() {
 
   useEffect(() => {
     async function fetchData() {
+      const guestSesionId = await getGuestSessionId()
       const genres = await getMovieDBGenre()
+
       setGenresList(genres)
+      setSesionId(guestSesionId)
+      console.log(`useEffect ${guestSesionId}`)
     }
 
     fetchData()
   }, [])
 
-  return (
-    <>
-      <main className="content">
-        <Search onSearch={onSearch} pageCurrent={pageCurrent} setPageCurrent={setPageCurrent} />
-        <GenresContext.Provider value={genresList}>
-          <ContentView loading={loading} error={error} totalResults={totalResults} films={films} />
-        </GenresContext.Provider>
-      </main>
-      <PagePagination setPageCurrent={setPageCurrent} pageCurrent={pageCurrent} totalResults={totalResults} />
-    </>
-  )
-}
+  const tabs = [
+    {
+      key: '1',
+      label: 'Search',
+      forceRender: true,
+      children: (
+        <div className="content">
+          <Search onSearch={onSearch} pageCurrent={pageCurrent} setPageCurrent={setPageCurrent} />
+          <GenresContext.Provider value={genresList}>
+            <ContentView
+              loading={loading}
+              error={error}
+              totalResults={totalResults}
+              films={films}
+              sessionId={sessionId}
+            />
+          </GenresContext.Provider>
+          <PagePagination setPageCurrent={setPageCurrent} pageCurrent={pageCurrent} totalResults={totalResults} />
+        </div>
+      ),
+    },
 
-function ContentView({ loading, error, totalResults, films }) {
-  const hasData = !(loading || error)
-  const displayContent =
-    totalResults === 0 ? (
-      <Alert message="Not found" description="No films have been found at your request" type="info" />
-    ) : (
-      <CardList films={films} />
-    )
+    {
+      key: '2',
+      label: 'Rated',
+      children: (
+        <RatedList
+          genresList={genresList}
+          loading={loading}
+          error={error}
+          totalResults={totalResults}
+          fillCards={fillCards}
+          sessionId={sessionId}
+        />
+      ),
+    },
+  ]
 
-  const errorMsg = error ? <ErrorIndicator /> : null
-  const spiner = loading ? (
-    <div className="spiner-warapper">
-      <Spin size="large" />
-    </div>
-  ) : null
-  const content = hasData ? displayContent : null
-
-  return (
-    <>
-      {errorMsg}
-      {spiner}
-      {content}
-    </>
-  )
+  return <Tabs defaultActiveKey="1" items={tabs} centered destroyInactiveTabPane />
 }

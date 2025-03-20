@@ -2,6 +2,8 @@ import { useState, useCallback, useEffect } from 'react'
 import { Input } from 'antd'
 import debounce from 'lodash.debounce'
 
+import './Search.css'
+
 export default function Search({ onSearch, pageCurrent, setPageCurrent }) {
   const [value, setValue] = useState('')
   const debouncedSearch = useCallback(debounce(onSearch, 1000), [])
@@ -19,5 +21,5 @@ export default function Search({ onSearch, pageCurrent, setPageCurrent }) {
     setPageCurrent(1)
   }
 
-  return <Input placeholder="Type to search..." onChange={onChange} value={value} />
+  return <Input className="search" placeholder="Type to search..." onChange={onChange} value={value} />
 }
