@@ -7,7 +7,7 @@ import './ContentView.css'
 export default function ContentView({ loading, error, totalResults, films, sessionId }) {
   const hasData = !(loading || error)
   const displayContent =
-    totalResults === 0 ? (
+    totalResults === 0 || films.length === 0 ? (
       <Alert message="Not found" description="No films have been found at your request" type="info" />
     ) : (
       <CardList films={films} sessionId={sessionId} />

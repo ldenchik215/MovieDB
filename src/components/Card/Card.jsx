@@ -1,4 +1,3 @@
-/*eslint no-unused-vars: "warn"*/
 import React, { useContext } from 'react'
 import { format } from 'date-fns'
 import { Tag } from 'antd'

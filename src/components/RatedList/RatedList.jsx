@@ -1,4 +1,3 @@
-/*eslint no-unused-vars: "warn"*/
 import React, { useState, useEffect } from 'react'
 
 import { getRatedMovies } from '../Services/Servises'
@@ -6,14 +5,13 @@ import ContentView from '../ContentView/ContentView'
 import GenresContext from '../../context/GenresContext'
 import PagePagination from '../Pagination/PagePagination'
 
-export default function RatedList({ fillCards, genresList, sessionId }) {
+export default function RatedList({ fillCards, genresList, sessionId, loading, setLoading, error, setError }) {
   const [ratedFilms, setRatedFilms] = useState([])
   const [totalResults, setTotalResults] = useState(0)
   const [pageCurrent, setPageCurrent] = useState(1)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
+  //const [error, setError] = useState(false)
 
-  function onError(err) {
+  function onError() {
     setError(true)
     setLoading(false)
   }
@@ -33,6 +31,10 @@ export default function RatedList({ fillCards, genresList, sessionId }) {
     }
 
     fetchData()
+
+    return () => {
+      setLoading(true)
+    }
   }, [pageCurrent])
 
   return (

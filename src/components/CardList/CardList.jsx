@@ -1,4 +1,3 @@
-/*eslint no-unused-vars: "warn"*/
 import React from 'react'
 
 import Card from '../Card/Card'

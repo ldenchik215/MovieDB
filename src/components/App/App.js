@@ -1,14 +1,7 @@
-/*eslint no-unused-vars: "warn"*/
 import React, { useState, useEffect } from 'react'
 import { Tabs } from 'antd'
 
-import {
-  getMovieDBGenre,
-  getMovieDBSearch,
-  getMovieDBPopular,
-  getGuestSessionId,
-  getRatedMovies,
-} from '../Services/Servises'
+import { getMovieDBGenre, getMovieDBSearch, getMovieDBPopular, getGuestSessionId } from '../Services/Servises'
 import GenresContext from '../../context/GenresContext'
 import Search from '../Search/Search'
 import PagePagination from '../Pagination/PagePagination'
@@ -24,35 +17,35 @@ export default function App() {
   const [pageCurrent, setPageCurrent] = useState(1)
   const [totalResults, setTotalResults] = useState(0)
   const [genresList, setGenresList] = useState([])
-  const [ratedFilms, setRatedFilms] = useState([])
+  const [searchValue, setSearchValue] = useState('')
 
-  function onError(err) {
+  function onError() {
     setError(true)
     setLoading(false)
   }
 
-  function onTest() {
-    console.log(sessionId)
-  }
-
   const fillCards = (filmsArray = []) => {
-    return filmsArray.map((movie) => ({
-      id: movie.id,
-      posterPath: movie.poster_path,
-      title: movie.title,
-      overview: movie.overview,
-      voteAverage: movie.vote_average,
-      releaseDate: movie.release_date,
-      genreIds: movie.genre_ids,
-      rating: movie.rating,
-    }))
+    const result = filmsArray.map((movie) => {
+      const rating = localStorage.getItem(movie.id)
+
+      return {
+        id: movie.id,
+        posterPath: movie.poster_path,
+        title: movie.title,
+        overview: movie.overview,
+        voteAverage: movie.vote_average,
+        releaseDate: movie.release_date,
+        genreIds: movie.genre_ids,
+        rating,
+      }
+    })
+
+    return result
   }
 
   const onSearch = async (inputValue = '', page = 1) => {
     setLoading(true)
     setError(false)
-    console.log(`search ${sessionId}`)
-    onTest()
 
     try {
       const moviesList = inputValue.trim() ? await getMovieDBSearch(inputValue, page) : await getMovieDBPopular(page)
@@ -74,20 +67,27 @@ export default function App() {
 
       setGenresList(genres)
       setSesionId(guestSesionId)
-      console.log(`useEffect ${guestSesionId}`)
     }
 
+    localStorage.clear()
     fetchData()
+
+    return setLoading(true)
   }, [])
 
   const tabs = [
     {
       key: '1',
       label: 'Search',
-      forceRender: true,
       children: (
         <div className="content">
-          <Search onSearch={onSearch} pageCurrent={pageCurrent} setPageCurrent={setPageCurrent} />
+          <Search
+            onSearch={onSearch}
+            pageCurrent={pageCurrent}
+            setPageCurrent={setPageCurrent}
+            searchValue={searchValue}
+            setSearchValue={setSearchValue}
+          />
           <GenresContext.Provider value={genresList}>
             <ContentView
               loading={loading}
@@ -109,7 +109,9 @@ export default function App() {
         <RatedList
           genresList={genresList}
           loading={loading}
+          setLoading={setLoading}
           error={error}
+          setError={setError}
           totalResults={totalResults}
           fillCards={fillCards}
           sessionId={sessionId}

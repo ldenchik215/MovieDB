@@ -6,9 +6,10 @@ import { postRating } from '../Services/Servises'
 export default function StarRate({ movieId, rating, sessionId }) {
   const [starCount, setStarCount] = useState(rating)
 
-  const onChange = (num) => {
-    setStarCount(num)
-    postRating(movieId, num, sessionId)
+  const onChange = (rate) => {
+    setStarCount(rate)
+    postRating(movieId, rate, sessionId)
+    localStorage.setItem(movieId, rate)
   }
 
   return (
@@ -29,7 +30,7 @@ export default function StarRate({ movieId, rating, sessionId }) {
         allowClear={false}
         starSize={15}
         onChange={onChange}
-        value={starCount}
+        value={Number(starCount)}
       />
     </ConfigProvider>
   )
